@@ -1,12 +1,17 @@
 require('dotenv').config();
 const express = require("express");
+const { default: helmet } = require('helmet');
+const morgan = require('morgan');
 const app = express();
 const connectDB = require("./config/db");
 const errorHandler = require("./middleware/error");
 
-connectDB();
 
+connectDB();
+//middleware
 app.use(express.json());
+app.use(helmet());
+app.use(morgan("common"));
 
 app.get("/", (req, res, next) => {
   res.send("Api running");
@@ -15,7 +20,8 @@ app.get("/", (req, res, next) => {
 // Connecting Routes
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/private", require("./routes/private"));
-
+app.use("/api/users", require("./routes/users"));
+app.use("/api/posts", require("./routes/posts"));
 // Error Handler Middleware
 app.use(errorHandler);
 

@@ -8,7 +8,7 @@ const PrivateScreen = ({history}) => {
 
   useEffect(() => {
     if (!localStorage.getItem("authToken")) {
-        history.push("/Signin");
+        history.push("/signin");
     }
     const fetchPrivateDate = async () => {
       const config = {

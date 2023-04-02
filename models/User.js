@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require('jsonwebtoken');
+const { boolean } = require('webidl-conversions');
 
 const UserSchema = new mongoose.Schema({
   fullName: {
@@ -48,10 +49,9 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     required: [true, 'Birth Date is required']
   },
-  role:{
-    type: String,
-    enum: ['admin', 'user'],
-    default: 'user'
+  isAdmin:{
+    type: Boolean,
+    default: false,
   },
   contactInfo: {
     phone: {
@@ -87,11 +87,15 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
-  friends: [{
+  followers: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'users'
   }],
   closeFriends: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'users'
+  }],
+  following: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'users'
   }],
@@ -102,13 +106,17 @@ const UserSchema = new mongoose.Schema({
       postVisibility: 'public',
     },
   },
+  likes:{
+    type: [String]
+  },
   createdAt: {
     type: Date,
     default: Date.now()
   },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
-});
+  
+},{timestamp: true});
 
 
 UserSchema.pre("save", async function (next) {

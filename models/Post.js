@@ -1,22 +1,46 @@
 const mongoose = require('mongoose')
 const PostSchema = new mongoose.Schema({
-    name: {
+    category: {
         type: String,
-        required: [true, 'name is required']
+        enum: ['Birthday','Marriage','Baby Shower','Event','Other'],
+        required: [true, 'type is required']
       },
-      description : String,
-      media : [],
+      caption :{
+        type:String,
+        maxlength:500,
+      } ,
+      pictrue:{
+        type:String,
+      },
+      video:{
+        type:String,
+      },
       creator:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users',
         required : true
       },
+      likers:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'users',
+      }],
       createdAt: {
         type: Date,
         default: Date.now()
       }, 
+      comments:{
+        type:[
+          {
+            commenterId:String,
+            commenterName:String,
+            text:String,
+            timestamp: Number,
+          }
+        ],
+        required :true,
+      },
 
-});
+},{timestamp: true});
 const Post = mongoose.model("posts", PostSchema);
 
 module.exports = Post;
