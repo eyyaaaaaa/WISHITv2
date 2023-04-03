@@ -1,9 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
-import "./ForgotPasswordScreen.css";
 import "./auth.css";
-/*hello*/
-const ForgotPasswordScreen = ({history}) => {
+const ForgotPasswordScreen = () => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -23,7 +21,7 @@ const ForgotPasswordScreen = ({history}) => {
         {email} ,
         config
       );
-        setSuccess('Email sent');
+        setSuccess(data.data);
     } catch (error) {
       setError(error.response.data.error);
       setEmail("");

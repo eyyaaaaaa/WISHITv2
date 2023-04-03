@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-
-import "./ResetPasswordScreen.css";
+import "./auth.css";
 
 const ResetPasswordScreen = ({ match }) => {
   const [password, setPassword] = useState("");
@@ -30,7 +29,7 @@ const ResetPasswordScreen = ({ match }) => {
 
     try {
       const { data } = await axios.put(
-        `/api/auth/resetPassword/${match.params.resetToken}`,
+        `/api/auth/resetpassword/${match.params.resetToken}`,
         {
           password,
         },
@@ -56,7 +55,7 @@ const ResetPasswordScreen = ({ match }) => {
         {error && <span className="error-message">{error} </span>}
         {success && (
           <span className="success-message">
-            {success} <Link to="/signin">Sign In</Link>
+            {success} <Link to="/Signin">Sign In</Link>
           </span>
         )}
         <div className="form-group">

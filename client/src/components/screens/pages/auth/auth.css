@@ -4,7 +4,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: url(../../../public/Vector.svg) bottom no-repeat, url(../../../public/zyro-image.png) top no-repeat;
+  background: url(../../../../../public/Vector.svg) bottom no-repeat, url(../../../../../public/zyro-image.png) top no-repeat;
   background-size: contain, cover;
 }
 .forgotpassword-screen__form, .signup-screen__form, .signin-screen__form, .resetpassword-screen__form{
