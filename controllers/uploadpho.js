@@ -1,35 +1,32 @@
-const User = require ('../models/User');
-const fs = require ('fs');
-const {promisify} = require('util');
+const { promisify } = require('util');
+const fs = require('fs');
 const { uploadError } = require('../utils/uploadErrors');
 const pipeline = promisify(require('stream').pipeline);
-const multer = require("multer");
-const upload = multer().single('file');
 
-
-//upload profile photo
+// Upload profile photo controller
 exports.uploadProfile = async (req, res) => {
-  console.log('work')
-    try {
-      if (
-      req.file.detectedMimeType !== "image/jpg" && 
-      req.file.detectedMimeType !== "image/png" &&
-      req.file.detectedMimeType !== "image/jpeg"
-      )
-      throw Error ("Invalid File Type!");
-      if (req.file.size> 500000) throw Error ("Size Unsupported!");
-    } catch (err) {
-      const errors = uploadError(err)
-      return res.status(201).json({errors});
+  try {
+    if (!req.file) {
+      throw new Error('No file uploaded');
     }
-    const fileName = req.body.fullName + ".jpg";
-    console.log(`${__dirname}/../client/public/uploads/profile/${fileName}`);
+    if (
+      req.file.mimetype !== 'image/jpg' &&
+      req.file.mimetype !== 'image/png' &&
+      req.file.mimetype !== 'image/jpeg'
+    ) {
+      throw new Error('Invalid File Type');
+    }
+    if (req.file.size > 500000) {
+      throw new Error('Size Unsupported');
+    }
+    const fileName = Date.now() + file.originalname + '.jpg';
     await pipeline(
       req.file.stream,
-      fs.createWriteStream(
-        `${__dirname}/../client/public/uploads/profile/${fileName}`
-      )
-    )
-  };
-
-//upload profile photo
+      fs.createWriteStream(`${__dirname}/../client/public/uploads/profile/${fileName}`)
+    );
+    res.status(200).json({ success: true, message: 'File uploaded successfully' });
+  } catch (err) {
+    const errors = uploadError(err);
+    return res.status(201).json({ errors });
+  }
+};

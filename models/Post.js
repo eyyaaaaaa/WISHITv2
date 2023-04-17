@@ -9,7 +9,7 @@ const PostSchema = new mongoose.Schema({
         type:String,
         maxlength:500,
       } ,
-      pictrue:{
+      picture:{
         type:String,
       },
       video:{

@@ -1,14 +1,16 @@
 const express = require ('express');
 const router = express.Router();
 
-const { readPost, createPost, updatePost, deletePost, likePost, unlikePost, commentPost, editCommentPost, deleteCommentPost } = require('../controllers/posts.js');
+const { readPost, createPost, updatePost, deletePost, likePost, readTimelinePost, commentPost, editCommentPost, deleteCommentPost, readProfilePost } = require('../controllers/posts.js');
 
 router.get('/', readPost);
+router.get('/:id', readTimelinePost);
+router.get('/profile/:id', readProfilePost);
 router.post('/', createPost);
 router.put('/:id', updatePost);
 router.delete('/:id', deletePost);
 router.patch('/likepost/:id', likePost);
-router.patch('/unlikepost/:id', unlikePost);
+
 
 // comments
 router.patch('/commentpost/:id', commentPost);

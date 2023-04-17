@@ -43,6 +43,7 @@ exports.signup = async (req, res, next) => {
     });
     console.log('User created:', user);
     sendToken(user,200, res);
+
   } catch (err) {
     next(err);
   }
@@ -132,5 +133,5 @@ exports.resetPassword = async (req, res, next) => {
 
 const sendToken = (user, statusCode, res) => {
   const token = user.getSignedJwtToken();
-  res.status(statusCode).json({ sucess: true, token });
+  res.status(statusCode).json({ sucess: true, token, userId: user._id });
 };

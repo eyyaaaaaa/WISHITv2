@@ -35,10 +35,12 @@ const SignInScreen = ({ history }) => {
       );
 
       localStorage.setItem("authToken", data.token);
+      localStorage.setItem("userId", data.userId);
 
       history.push("/");
     } catch (error) {
       setError(error.response.data.error);
+      console.log(error);
       setTimeout(() => {
         setError("");
       }, 5000);
