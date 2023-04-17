@@ -1,7 +1,8 @@
+const { json } = require("express");
 const Post = require("../models/Post.js");
 const User = require("../models/User.js");
 const ObjectId = require("mongoose").Types.ObjectId;
-//get a post
+//get posts (filter)
 exports.readPost = async (req, res) => {
     try {
         const docs = await Post.find().sort({createdAt: -1});
@@ -10,7 +11,23 @@ exports.readPost = async (req, res) => {
         console.log("error to get data: " + err);
     }
 };
-//get a post
+//get posts (filter)
+
+//get posts (timeline)
+exports.readTimelinePost = async (req, res) => {
+  try {
+      const currentUser= await User.findById(req.params.id);
+      const userPosts= await Post.find({creator:currentUser._id });
+      const friendPosts = await Promise.all(
+        currentUser.following.map(async (friendId) => {
+          return await Post.find({ creator: friendId });
+        }));
+      res.status(200).json(userPosts.concat(...friendPosts))
+  } catch (err) {
+      res.status(500), json(err);
+  }
+};
+//get posts (timeline)
 
 //create a post
 exports.createPost = async (req, res) => {
@@ -33,44 +50,63 @@ exports.createPost = async (req, res) => {
 
 //update a post
 exports.updatePost = async (req, res) => {
-    if (!ObjectId.isValid(req.params.id))
-        return res.status(400).send("ID unknown: "+ req.params.id);
-    const updatedRecord={
+  if (!ObjectId.isValid(req.params.id))
+    return res.status(400).send("ID unknown: " + req.params.id);
+
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).send("Post Not Found !");
+    if (post.creator.toString() !== req.body.creator)
+      return res.status(403).send("You Can Only Update Your Own Posts !");
+    else {
+      const updatedRecord = {
         caption: req.body.caption,
+      };
+      const docs = await Post.findByIdAndUpdate(
+        req.params.id,
+        { $set: updatedRecord },
+        { new: true }
+      );
+      res.send(docs);
     }
-    try {
-        const docs = await Post.findByIdAndUpdate(
-            req.params.id,
-            {$set: updatedRecord},
-            {new:true}
-        );
-        res.send(docs);
-    } catch (err) {
-        console.log("Update error: " + err);
-    }
+  } catch (err) {
+    console.log("Update error: " + err);
+  }
 };
+
 //update a post
 
 //delete a post
 exports.deletePost = async (req, res) => {
-    if (!ObjectId.isValid(req.params.id))
-        return res.status(400).send("ID unknown: "+ req.params.id);
-    try {
-        const deletedPost = await Post.findByIdAndDelete(req.params.id);
-        res.send(deletedPost);
-    } catch (err) {
-        console.log("Delete error: " + err);
+  if (!ObjectId.isValid(req.params.id))
+    return res.status(400).send("ID unknown: " + req.params.id);
+
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).send("Post Not Found !");
+    if (post.creator.toString() !== req.body.creator)
+      return res.status(403).send("You Can Only Delete Your Own Posts !");
+    else {
+      const deletedPost = await Post.findByIdAndDelete(req.params.id);
+      res.send(deletedPost);
     }
+  } catch (err) {
+    console.log("Delete error: " + err);
+  }
 };
 //delete a post
 
-//like a post
+
+//unlike a post
 exports.likePost = async (req, res) => {
     if (!ObjectId.isValid(req.params.id))
         return res.status(400).send("ID unknown: "+ req.params.id);
 
     try {
-        const post = await Post.findByIdAndUpdate(
+        const post = await Post.findById(req.params.id).exec();
+
+        if (!post.likers.includes(req.body.id)) {
+          const post = await Post.findByIdAndUpdate(
             req.params.id,
             {
                 $addToSet: {likers: req.body.id}
@@ -87,25 +123,8 @@ exports.likePost = async (req, res) => {
         ).exec();
 
         res.send({post, user});
-
-    } catch (err) {
-        return res.status(400).send(err);
-    }
-};
-//like a post
-
-//unlike a post
-exports.unlikePost = async (req, res) => {
-    if (!ObjectId.isValid(req.params.id))
-        return res.status(400).send("ID unknown: "+ req.params.id);
-
-    try {
-        const post = await Post.findById(req.params.id).exec();
-
-        if (!post.likers.includes(req.body.id)) {
-            return res.status(400).send("You haven't liked this post before");
         }
-
+        else{
         const updatedPost = await Post.findByIdAndUpdate(
             req.params.id,
             {
@@ -123,6 +142,7 @@ exports.unlikePost = async (req, res) => {
         ).exec();
 
         res.send({post: updatedPost, user: updatedUser});
+       }
 
     } catch (err) {
         return res.status(400).send(err);
@@ -205,3 +225,17 @@ exports.deleteCommentPost = async (req, res) => {
   };
   
 //delete comment a post
+
+
+//get posts (profile)
+exports.readProfilePost = async (req, res) => {
+  try {
+    const currentUser = await User.findById(req.params.id);
+    const userPosts = await Post.find({ creator: currentUser._id });
+    res.status(200).json(userPosts);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+//get posts (profile)
+
