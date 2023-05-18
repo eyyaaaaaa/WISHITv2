@@ -3,7 +3,7 @@ const PostSchema = new mongoose.Schema({
     category: {
         type: String,
         enum: ['Birthday','Marriage','Baby Shower','Event','Other'],
-        required: [true, 'type is required']
+        required: true
       },
       caption :{
         type:String,

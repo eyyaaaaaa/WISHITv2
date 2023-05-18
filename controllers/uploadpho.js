@@ -6,9 +6,7 @@ const pipeline = promisify(require('stream').pipeline);
 // Upload profile photo controller
 exports.uploadProfile = async (req, res) => {
   try {
-    if (!req.file) {
-      throw new Error('No file uploaded');
-    }
+
     if (
       req.file.mimetype !== 'image/jpg' &&
       req.file.mimetype !== 'image/png' &&

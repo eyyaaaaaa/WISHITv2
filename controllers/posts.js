@@ -1,7 +1,26 @@
 const { json } = require("express");
 const Post = require("../models/Post.js");
 const User = require("../models/User.js");
+const { uploadError } = require("../utils/uploadErrors.js");
 const ObjectId = require("mongoose").Types.ObjectId;
+const multer = require('multer');
+const path = require('path');
+
+// Set up the storage engine for multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    // Destination folder for uploaded files
+    const uploadPath = path.join(__dirname, '../client/public/uploads/posts/');
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    // Set the filename to be a combination of the creator's id and the current timestamp
+    cb(null, `${req.body.creator}_${Date.now()}_${file.originalname}`);
+  }
+});
+
+// Set up multer middleware with the storage engine
+const upload = multer({ storage });
 //get posts (filter)
 exports.readPost = async (req, res) => {
     try {
@@ -31,20 +50,34 @@ exports.readTimelinePost = async (req, res) => {
 
 //create a post
 exports.createPost = async (req, res) => {
-    const newPost = new Post({
-        creator:req.body.creator, 
-        caption:req.body.caption,
-        category:req.body.category,
-        video:req.body.video,
-        likes:[],
-        comments:[],
+  try {
+    // Call the multer middleware to handle the file upload
+    upload.single('file')(req, res, async (err) => {
+      if (err instanceof multer.MulterError) {
+        // Multer error occurred
+        return res.status(400).json({ success: false, error: err.message });
+      } else if (err) {
+        // Non-Multer error occurred
+        return res.status(400).json({ success: false, error: err });
+      }
+
+      // File upload successful, continue with creating the post
+      const newPost = new Post({
+        creator: req.body.creator,
+        caption: req.body.caption,
+        category: req.body.category,
+        picture: req.file ? `./uploads/posts/${req.file.filename}` : '',
+        video: req.body.video,
+        likes: [],
+        comments: []
+      });
+
+      const post = await newPost.save();
+      return res.status(201).json(post);
     });
-    try {
-        const post = await newPost.save();
-        return res.status(201).json(post);
-    } catch (err) {
-        res.status(400).send(err);
-    }
+  } catch (err) {
+    res.status(400).send(err);
+  }
 };
 //create a post
 
@@ -56,8 +89,6 @@ exports.updatePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).send("Post Not Found !");
-    if (post.creator.toString() !== req.body.creator)
-      return res.status(403).send("You Can Only Update Your Own Posts !");
     else {
       const updatedRecord = {
         caption: req.body.caption,
@@ -84,12 +115,9 @@ exports.deletePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).send("Post Not Found !");
-    if (post.creator.toString() !== req.body.creator)
-      return res.status(403).send("You Can Only Delete Your Own Posts !");
-    else {
+
       const deletedPost = await Post.findByIdAndDelete(req.params.id);
       res.send(deletedPost);
-    }
   } catch (err) {
     console.log("Delete error: " + err);
   }

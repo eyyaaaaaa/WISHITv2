@@ -1,43 +1,62 @@
+import { useDispatch, useSelector } from 'react-redux';
 import './comments.scss'
+import { useState } from 'react';
+import { isEmpty, timestampParser } from '../Routes/Utils';
+import { Link } from "react-router-dom";
+import { addComment, getPosts } from '../../../../actions/post.actions';
+import EditDeleteComment from './EditDeleteComment';
 
-export default function Comments() {
+export default function Comments({ post }) {
      //Temporary
-  const comments = [
-    {
-      id: 1,
-      desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem nequeaspernatur ullam aperiam. Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem nequeaspernatur ullam aperiam",
-      name: "John Doe",
-      userId: 1,
-      profilePicture:
-        "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    },
-    {
-      id: 2,
-      desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem nequeaspernatur ullam aperiam",
-      name: "Jane Doe",
-      userId: 2,
-      profilePicture:
-        "https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    },
-  ];
+     const [text,setText] = useState('');
+     const user = useSelector((state)=> state.userReducer);
+     const users = useSelector((state)=> state.usersReducer);
+     const PF = process.env.REACT_APP_PUBLIC_FOLDER;
+     const dispatch= useDispatch();
+     const handleComment= (e) =>{
+      e.preventDefault();
+      if(text){
+        dispatch(addComment(post._id, user._id,text,user.fullName))
+        .then(()=> dispatch(getPosts()))
+        .then(()=> setText(''));
+      }
+     };
+
+  
   return (
     <div className="comments">
       <div className="write">
-        <img src={comments.profilePic} alt="" />
-        <input type="text" placeholder="write a comment" />
-        <button>Send</button>
+        <img src={user.profilePicture} alt="" />
+        <form action="" style={{display:"flex", width:"100%", gap:" 10px"}} onSubmit={handleComment}>
+          <input
+            style={{width:"90%"}}
+            type="text" 
+            name="text" 
+            onChange={(e)=> setText(e.target.value)}
+            value={text}
+            placeholder="write a comment" />
+          <button type='submit'>Send</button>
+        </form>
       </div>
       {
-        comments.map(comment =>(
-            <div className="comment">
-                <img src={comment.profilePicture} alt="" />
+        post.comments.map((comment) =>{
+          return(
+            <div className="comment" key={comment._id}>
+                <img src={!isEmpty(users[0])&& users.map((commenter)=>{if (commenter._id === comment.commenterId) return commenter.profilePicture ? "../" + commenter.profilePicture : PF + "profile/hacker.png"}).join("")} alt="commenter-pic" />
           <div className="info">
-            <span>{comment.name}</span>
-            <p>{comment.desc}</p>
-          </div>
-          <span className="date">1 hour ago</span>
+            <div className="userr" style={{display:'flex'}}>
+            <Link to={`/profile/${comment.commenterId}`} style={{ textDecoration: "none", color: "inherit" }}>
+              <span style={{paddingRight:'5px'}}>{comment.commenterName} </span>
+            </Link>
+            <span className="date">{timestampParser(comment.timestamp)}</span>
             </div>
-        ))
+            <p>{comment.text}</p>
+          </div>
+          {comment.commenterId === user._id &&(
+            <EditDeleteComment className="dots" comment={comment} postId={post._id}/>
+          )}
+            </div>
+        )})
     }
 
     </div>

@@ -19,6 +19,7 @@ export default function Sidebar() {
     const logoutHandler = () => {
       localStorage.removeItem("authToken");
       localStorage.removeItem("userId");
+      localStorage.removeItem("admin");
       history.push("/Signin");
     };
 
@@ -27,7 +28,7 @@ export default function Sidebar() {
     <div className="sidebar">
       <div className="sidebarContainer">
       <div className="sidebarWrapper">
-        <ul className="sidebarList">
+        <ul className="SidebarList">
           <Link to="/" className="custom-link">
           <li className="sidebarListItem">
             <Home className="sidebarIcon" />
@@ -52,22 +53,24 @@ export default function Sidebar() {
             <span className="sidebarListItemText">Create new post</span>
           </li>
           </Link>
-          
+          <Link to="/chat" className="custom-link">
           <li className="sidebarListItem">
             <Chat className="sidebarIcon" />
             <span className="sidebarListItemText">Chat</span>
           </li>
+          </Link>
           <Link to="/friendsList" className="custom-link">
           <li className="sidebarListItem">
             <Group className="sidebarIcon" />
             <span className="sidebarListItemText">friends'list</span>
           </li>
           </Link>
-          
+          <Link to="/settings" className="custom-link">
           <li className="sidebarListItem">
             <Settings className="sidebarIcon" />
             <span className="sidebarListItemText">Settings</span>
           </li>
+          </Link>
           <li className="sidebarListItem log" >
             <Logout className="sidebarIcon" />
             <span className="sidebarListItemText" onClick={logoutHandler}>logout</span>

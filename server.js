@@ -13,8 +13,8 @@ app.use(express.json());
 app.use(helmet());
 app.use(morgan("common"));
 
-app.get("/", (req, res, next) => {
-  res.send("Api running");
+app.get("/",function(req, res){
+  res.sendFile(__dirname+'/bin/index.html'); // change the path to your index.html
 });
 
 // Connecting Routes
@@ -23,6 +23,8 @@ app.use("/api/private", require("./routes/private"));
 app.use("/api/users", require("./routes/users"));
 app.use("/api/posts", require("./routes/posts"));
 app.use("/api/gifts", require("./routes/gifts"));
+app.use("/api/chats", require("./routes/chatRoute"));
+app.use("/api/messages", require("./routes/messageRoute"));
 // Error Handler Middleware
 app.use(errorHandler);
 

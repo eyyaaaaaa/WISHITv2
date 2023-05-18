@@ -1,19 +1,35 @@
 import "./profile.scss";
 import Posts from "../../../components/posts/Posts"
-import { useState, useEffect } from 'react';
-import { Menu, MenuItem } from "@mui/material";
+import React, { useState, useEffect } from 'react';
 import { MoreHoriz } from "@mui/icons-material";
-import { Link } from "react-router-dom";
 import axios from "axios";
 import { useParams } from "react-router";
+import FollowHandler from "./FollowHandler";
+import { useSelector } from "react-redux";
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
+const style = {
+  position: 'absolute' ,
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
 const Profile = () => {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [openFollowers, setOpenFollowers] = React.useState(false);
+  const handleOpenFollowers = () => setOpenFollowers(true);
+  const handleCloseFollowers = () => setOpenFollowers(false);
   const [user, setUser] = useState({});
   const [error,setError] = useState();
   const id= useParams().id
-
+  const PF = process.env.REACT_APP_PUBLIC_FOLDER;
+  const cUser = useSelector((state)=> state.userReducer);
 
   /*useEffect(() => {
     const getUserInfo = async () => {
@@ -37,15 +53,6 @@ const Profile = () => {
   }, [id]);
   
 
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-    setMenuOpen(true);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setMenuOpen(false);
-  };
 
   return error ? (
     <span className="error-message">{error}</span>
@@ -58,7 +65,7 @@ const Profile = () => {
           className="cover"
         />
         <img
-          src="https://images.pexels.com/photos/14028501/pexels-photo-14028501.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load"
+          src={user.profilePicture ? "../" + user.profilePicture : PF + "profile/hacker.png"}
           alt=""
           className="profilePic"
         />
@@ -66,30 +73,34 @@ const Profile = () => {
       <div className="profileContainer">
         <div className="uInfo">
           <div className="left">
-            <button>Follow</button>
+          {cUser._id !== user._id &&
+              <FollowHandler idToFollow={user._id}/>
+          }
           </div>
           <div className="center">
             <span>{user.fullName}</span>
           </div>
           <div className="right">
-            <MoreHoriz className="dropdown-icon" onClick={handleMenuOpen} />
-            <Menu
-              anchorEl={anchorEl}
-              open={menuOpen}
-              onClose={handleMenuClose}
-              className="dropdown-menu"
-            >
-              <MenuItem onClick={handleMenuClose}>
-                <Link to="/newpost" className="dropdown-link">
-                  New Post
-                </Link>
-              </MenuItem>
-              <MenuItem onClick={handleMenuClose}>
-                <Link to="/editprofile" className="dropdown-link">
-                  Edit Profile
-                </Link>
-              </MenuItem>
-            </Menu>
+            <MoreHoriz className="dropdown-icon" onClick={handleOpenFollowers} />
+            <Modal
+                open={openFollowers}
+                onClose={handleCloseFollowers}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+              >
+                <Box sx={style}>
+                  <Typography id="modal-modal-title" variant="h6" component="h2">
+                    {user.fullName}
+                  </Typography>
+                  <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                    <ul>
+                     <li>Education: {user.education}</li>
+                     <li>Job: {user.job}</li>
+                     <li>Bio: {user.bio}</li>
+                    </ul>
+                  </Typography>
+                </Box>
+              </Modal>
           </div>
         </div>
         <Posts userId={user._id}/>

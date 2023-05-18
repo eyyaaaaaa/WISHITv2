@@ -1,5 +1,5 @@
 import "./tuto.scss"
-
+import videoFile from "./tuto.mp4";
 export default function Tuto() {
   return (
     <div className="tuto">
@@ -7,10 +7,9 @@ export default function Tuto() {
       <div className="tutoTitle">
         Hey make a wish !
       </div>
-      
-      <video width="100%" controls>
-        <source src="chemin_vers_la_video.mp4" type="video/mp4" />
-     </video>
+      <div className="vid">
+        <video autoPlay muted loop width="100%" src={videoFile}/>
+      </div>
 
       
     </div>

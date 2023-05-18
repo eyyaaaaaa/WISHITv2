@@ -1,44 +1,46 @@
 import "./newpost.scss";
 import React, { useState } from "react";
-import axios from "axios";
-
+import { useDispatch, useSelector } from "react-redux";
+import { addPost, getPosts } from "../../../../../actions/post.actions";
+import { isEmpty } from '../../../components/Routes/Utils';
 function NewPost() {
   const [caption, setCaption] = useState("");
-  const [media, setMedia] = useState(null);
+  const [file, setFile] = useState(null);
   const [eventType, setEventType] = useState("");
-
+  const user = useSelector((state)=> state.userReducer);
+  const error = useSelector((state) => state.errorReducer.postError);
+  const dispatch = useDispatch();
   // define event handlers for input fields
   const handleCaptionChange = (e) => {
     setCaption(e.target.value);
   };
 
   const handleMediaChange = (e) => {
-    setMedia(e.target.files[0]);
+    setFile(e.target.files[0]);
   };
 
   const handleEventTypeChange = (e) => {
     setEventType(e.target.value);
   };
 
-  // define function to handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append("caption", caption);
-    formData.append("media", media);
-    formData.append("eventType", eventType);
+  const handleCancelPost = (e) => {
+    setEventType("");
+    setCaption("");
+    setFile(null);
+  };
+  const handleSubmit = async () => {
+    if (caption || file) {
+      const data = new FormData();
+      data.append('creator', user._id);
+      data.append('caption', caption);
+      if (file) data.append("file", file);
+      data.append('category', eventType);
 
-    try {
-      const response = await axios.post("/api/posts", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
-      });
-      console.log(response.data);
-      // Do something after successful post creation
-    } catch (error) {
-      console.error(error);
-      // Handle error
+      await dispatch(addPost(data));
+      dispatch(getPosts());
+      handleCancelPost();
+    } else {
+      alert("you have to fill the fields")
     }
   };
 
@@ -49,6 +51,7 @@ function NewPost() {
           onSubmit={handleSubmit}
           style={{ display: "inline-block", justifyItems: "center" }}
         >
+          <h2 className="NewTitle">New Post</h2>
           <div className="form-group">
             <label htmlFor="caption">Caption</label>
             <input
@@ -66,6 +69,7 @@ function NewPost() {
               type="file"
               className="form-control-file"
               id="media"
+              name="file"
               onChange={handleMediaChange}
             />
           </div>
@@ -78,20 +82,26 @@ function NewPost() {
               onChange={handleEventTypeChange}
             >
               <option value="">Select an event type</option>
-              <option value="event">Event</option>
-              <option value="birthday">Birthday</option>
-              <option value="babyShower">Baby Shower</option>
-              <option value="marriage">Marriage</option>
-              <option value="other">Other</option>
+              <option value="Event">Event</option>
+              <option value="Birthday">Birthday</option>
+              <option value="Baby Shower">Baby Shower</option>
+              <option value="Marriage">Marriage</option>
+              <option value="Other">Other</option>
             </select>
           </div>
-          <button type="submit" className="btn btn-primary">
+          {!isEmpty(error.format) && <p>{error.format}</p>}
+          {!isEmpty(error.maxSize) && <p>{error.maxSize}</p>}
+          <button style={{width:"40%"}} type="submit" className="btn btn-primary">
             Create Post
           </button>
+          { caption || eventType || file ?(
+          <button style={{marginLeft:'10px',width:"30%", background:"#e4e6eb"}} onClick={handleCancelPost} className="btn btn-primary">
+            Cancel
+          </button>) : null}
         </form>
       </div>
       <div className="preview-container">
-        <div className="preview-header">Preview</div>
+        <div className="preview-header"><h2>Preview</h2></div>
         <div className="preview-body">
           <div className="user">
             <img className="user__image" src="https://picsum.photos/id/1018/400" alt="user" />
@@ -102,9 +112,9 @@ function NewPost() {
             </div>
           </div>
           {eventType ? <div className="preview-eventType">{eventType}</div> :<div className="preview-eventType">Event Type</div> }
-          {media ? (
+          {file ? (
             <div className="preview-media">
-              <img src={URL.createObjectURL(media)} alt="post media" />
+              <img src={URL.createObjectURL(file)} alt="post media" />
             </div>
           ):(<div className="preview-media">
           <img src="https://picsum.photos/id/1018/400" alt="post media" />

@@ -10,9 +10,9 @@ const SignInScreen = ({ history }) => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (localStorage.getItem("authToken")) {
+    if (localStorage.getItem("authToken") ) {
       history.push("/");
-    }
+    } 
   }, [history]);
 
   const signinHandler = async (e) => {
@@ -36,6 +36,7 @@ const SignInScreen = ({ history }) => {
 
       localStorage.setItem("authToken", data.token);
       localStorage.setItem("userId", data.userId);
+      localStorage.setItem("admin", data.admin);
 
       history.push("/");
     } catch (error) {
