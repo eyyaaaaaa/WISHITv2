@@ -9,6 +9,7 @@
     font-size: 13px;
     color: themed("textColor");
     font-family: 'Lato',sans-serif;
+    height: min-content;
     
   .post__header {
     display: flex;
@@ -86,7 +87,9 @@
     z-index: 9;
 }
 
-  
+  .user__details{
+    display: flex;
+  }
   
   .post__image-container {
     overflow: hidden;
@@ -95,7 +98,7 @@
   
   .post__image {
     width: 100%;
-    height: auto;
+    height: 400px;
     object-fit: cover;
   }
   
@@ -176,3 +179,18 @@
   }
     
 }}
+.btn_update {
+  padding: 3%;
+  background-color: #FADC6D;
+  color: #333333;
+  width: 48%;
+  border-radius: 100px;
+  border: none;
+  float: right;
+  font-weight: bold;
+  font-size: 15px;
+
+}
+button.btn_update:hover {
+  background: #fadc6dab;
+}

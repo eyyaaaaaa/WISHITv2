@@ -1,24 +1,29 @@
 import "./posts.scss"
 import Post from "../post/Post"
-import axios from "axios";
-import { useEffect, useState } from "react";
 
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getHomePosts, getProfilePosts } from "../../../../actions/post.actions";
+import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
 export default function Posts({userId}) {
-  const [posts,setPosts] = useState([])
+
+  const user = useSelector((state)=> state.userReducer);
+  const posts = useSelector((state)=> state.postReducer);
+  const dispatch= useDispatch()
+  const location = useLocation();
+
   useEffect(()=>{
-    const fetchPosts = async () =>{
-      const res = userId ? 
-      await axios.get("/api/posts/profile/"+ userId) 
-      : await axios.get("/api/posts/641f10a7464e22996d0e55db");
-      setPosts(res.data)
+    if (location.pathname === '/') {
+      dispatch(getHomePosts(user._id))
+    } else {
+      dispatch(getProfilePosts(userId))
     }
-    fetchPosts();
-  },[userId] );
+  }, [location.pathname, userId, user._id,dispatch]);
   return (
     
     <div className="posts">
-    {posts.map(post=>(
-      <Post post={post} key={post._id}/>
+    {Array.isArray(posts) && posts.map(post=>(
+      <Post post={post} key={post._id} />
     ))}
   </div>
   )

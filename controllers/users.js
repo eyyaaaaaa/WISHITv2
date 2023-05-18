@@ -1,12 +1,21 @@
 
 const User = require("../models/User.js");
 const bcrypt = require('bcryptjs');
+const ErrorResponse = require("../utils/errorResponse");
+const sendEmail = require("../utils/sendEmail");
+
+//get all users
+exports.getAllUsers= async(req,res)=>{
+  const users= await User.find().select("-password");
+  res.status(200).json(users)
+}
+//get all users
 
 //get a user
 exports.getUser = async (req, res) => {
     const id = req.params.id;
     try {
-      const user = await User.findById(id);
+      const user = await User.findById(id).populate("followers").populate("following").populate("closeFriends");
       if (user) {
         res.status(200).json(user);
       }
@@ -21,27 +30,25 @@ exports.getUser = async (req, res) => {
 
 //update a user
 exports.updateUser = async (req, res) => {
+  try {
     const id = req.params.id;
-    const {userId,isAdmin, password} = req.body
-    if (id === userId || isAdmin){
-        if (password){
-            try{
-                const salt= await bcrypt.genSalt(10);
-                req.body.password = await bcrypt.hash(password,salt);
-            }catch(err){
-                return res.status(500).json(err);
-            }
-        }
-        try{
-            const user = await User.findByIdAndUpdate(id,req.body, {new:true})
-            res.status(200).json(user)
-        }catch(err){
-            res.status(500).json(err);
-        }
-    }else{
-        return res.status(403).json ("Access Denied!");
-    }
-  };
+    const { password} = req.body;
+      {/*if (password) {
+        const salt = await bcrypt.genSalt(10);
+        rest.password = await bcrypt.hash(password, salt);
+      }*/}
+      const user = await User.updateOne({_id: id}, { $set:{...req.body}});
+      if (user.modifiedCount) {
+        return res.status(200).send("updated");
+      }
+      res.status(200).send({ msg: "no modification" });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
+
+
 //update a user
 
 //delete a user
@@ -171,3 +178,26 @@ exports.removeCloseFriend = async (req, res) => {
     }
   };
 //remove a user from close friends
+
+//send request
+exports.sendRequest = async (req, res, next) => {
+
+  const { msg } = req.body;
+  const message = `
+  <p>${msg}</p>
+`;
+    try {
+      await sendEmail({
+        to: "eya.chtourou@etudiant-isi.utm.tn ",
+        subject: "User Request",
+        text: message,
+      });
+
+      res.status(200).json({ success: true, data: "Email Sent" });
+    } catch (err) {
+      console.log(err);
+      return next(new ErrorResponse("Email could not be sent", 500));
+      
+    }
+  } 
+  //send request

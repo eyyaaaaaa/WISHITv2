@@ -15,7 +15,7 @@ const SignUpScreen = ({ history }) => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (localStorage.getItem("authToken")) {
+    if (localStorage.getItem("authToken") ) {
       history.push("/");
     }
   }, [history]);
@@ -54,7 +54,8 @@ const SignUpScreen = ({ history }) => {
       );
       console.log(data);
       localStorage.setItem("authToken", data.token);
-
+      localStorage.setItem("userId", data.userId);
+      localStorage.setItem("admin", data.admin);
       history.push("/");
     } catch (error) {
       setError(error.response.data.error);
