@@ -9,6 +9,10 @@ const  GiftSchema = new mongoose.Schema({
     gifts: [{
       name: String,
       description: String,
+      isLiked: {
+        type: Boolean,
+        default: false
+      },
     }],
     creator:{
       type: mongoose.Schema.Types.ObjectId,

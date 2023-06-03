@@ -10,9 +10,24 @@ import { DarkModeContext } from "../../context/darkModeContext";
 import AdminTopbar from "../../components/adminComponents/AdminTopbar/AdminTopbar";
 import AdminRightbar from "../../components/adminComponents/AdminRightbar/AdminRightbar";
 import AdminSidebar from "../../components/adminComponents/AdminSidebar/AdminSidebar";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { getUser } from "../../../../actions/user.actions";
 
 export default function AdminScreen() {
+  const dispatch = useDispatch();
+  const userId = localStorage.getItem("userId");
+  useEffect(() => {
+    const getUserInfo = async () => {
+      try {
+        if (userId) dispatch(getUser(userId));
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    getUserInfo();
+  }, [userId,dispatch]);
+
     const Layout = ({ children }) => {
         const { darkMode } = useContext(DarkModeContext);  
         return  (

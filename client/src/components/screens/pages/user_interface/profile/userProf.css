@@ -48,3 +48,10 @@
     background: #e4e6eb;
     color: #161717;
 }
+a.dropdown-link {
+    text-decoration: none;
+    color: black;
+}
+svg.MuiSvgIcon-root.MuiSvgIcon-fontSizeMedium.dropdown-icon.css-i4bv87-MuiSvgIcon-root {
+    cursor: pointer;
+}

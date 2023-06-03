@@ -5,10 +5,15 @@ const ErrorResponse = require("../utils/errorResponse");
 const sendEmail = require("../utils/sendEmail");
 
 //get all users
-exports.getAllUsers= async(req,res)=>{
-  const users= await User.find().select("-password");
-  res.status(200).json(users)
-}
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({ isAdmin: { $ne: true } }).select("-password");
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 //get all users
 
 //get a user

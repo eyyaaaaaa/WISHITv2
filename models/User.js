@@ -53,6 +53,10 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  issignaled:{
+    type:Boolean,
+    default:false,
+  },
   contactInfo: {
     phone: {
       type: String,
