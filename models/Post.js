@@ -5,15 +5,21 @@ const PostSchema = new mongoose.Schema({
         enum: ['Birthday','Marriage','Baby Shower','Event','Other'],
         required: true
       },
+      reported: {
+        type: Boolean,
+        default: false,
+      }, 
       caption :{
         type:String,
         maxlength:500,
       } ,
       picture:{
         type:String,
+        default:""
       },
       video:{
         type:String,
+        default:""
       },
       creator:{
         type: mongoose.Schema.Types.ObjectId,
@@ -39,6 +45,7 @@ const PostSchema = new mongoose.Schema({
         ],
         required :true,
       },
+
 
 },{timestamp: true});
 const Post = mongoose.model("posts", PostSchema);

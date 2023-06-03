@@ -14,6 +14,15 @@
         margin: 15px;
         margin-top: 15px;
     }
+    .zina-container{
+        background-position: bottom;
+        background-repeat: no-repeat;
+        background-size: contain;
+        height: 29vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
     .rectangle {
         height: 20vh;
         background: red;

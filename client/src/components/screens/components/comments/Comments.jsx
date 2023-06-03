@@ -6,11 +6,12 @@ import { Link } from "react-router-dom";
 import { addComment, getPosts } from '../../../../actions/post.actions';
 import EditDeleteComment from './EditDeleteComment';
 
-export default function Comments({ post }) {
+export default function Comments({ post,showWrite }) {
      //Temporary
      const [text,setText] = useState('');
      const user = useSelector((state)=> state.userReducer);
      const users = useSelector((state)=> state.usersReducer);
+     
      const PF = process.env.REACT_APP_PUBLIC_FOLDER;
      const dispatch= useDispatch();
      const handleComment= (e) =>{
@@ -21,23 +22,30 @@ export default function Comments({ post }) {
         .then(()=> setText(''));
       }
      };
-
-  
   return (
     <div className="comments">
-      <div className="write">
-        <img src={user.profilePicture} alt="" />
-        <form action="" style={{display:"flex", width:"100%", gap:" 10px"}} onSubmit={handleComment}>
-          <input
-            style={{width:"90%"}}
-            type="text" 
-            name="text" 
-            onChange={(e)=> setText(e.target.value)}
-            value={text}
-            placeholder="write a comment" />
-          <button type='submit'>Send</button>
-        </form>
-      </div>
+  {showWrite && (
+  <div className="write">
+    <img src={user.profilePicture} alt="" />
+    <form
+      action=""
+      style={{ display: "flex", width: "100%", gap: "10px" }}
+      onSubmit={handleComment}
+    >
+      <input
+        style={{ width: "90%" }}
+        type="text"
+        name="text"
+        onChange={(e) => setText(e.target.value)}
+        value={text}
+        placeholder="write a comment"
+      />
+      <button type="submit">Send</button>
+    </form>
+  </div>
+)}
+
+
       {
         post.comments.map((comment) =>{
           return(

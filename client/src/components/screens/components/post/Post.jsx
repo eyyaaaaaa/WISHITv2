@@ -186,7 +186,7 @@ const Post = ({ post }) => {
         ></iframe>
         )}
       </div>
-      <Comments post={post}/>
+      <Comments post={post} showWrite={true}/>
         </div>
       </div> }
     </div>
